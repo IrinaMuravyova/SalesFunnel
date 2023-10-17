@@ -1,2 +1,2 @@
 # SalesFunnel
-English course sales funnel
+English course's sales funnel
