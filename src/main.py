@@ -82,3 +82,4 @@ if __name__ == "__main__":
 # db.add_age_category(id=5, age_category="40-49")
 # db.add_age_category(id=6, age_category="50-59")
 # db.add_age_category(id=7, age_category="60<")
+

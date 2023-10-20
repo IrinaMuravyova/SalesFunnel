@@ -94,3 +94,15 @@ def add_status(self, id: int, status: str):
         sql = f'INSERT INTO Statuses(id, status) VALUES(?,?)'
         parameters = (id, status)
         self.execute(sql, parameters, commit=True)
+
+# установка статуса видео для пользователя
+def set_status(self, **kwargs):
+        sql = f'UPDATE Users SET status_id WHERE '
+        parameters = self.format_args(sql, kwargs)
+        self.execute(sql, parameters, commit=True)
+
+# получение статуса видео для пользователя
+def get_status_from_user(self, **kwargs)-> list:
+    sql = 'SELECT status_id FROM Users WHERE '
+    sql, parameters = self.format_args(sql, kwargs)
+    return self.execute(sql, parameters, fetchone=True)
