@@ -29,9 +29,9 @@ class Database:
         sql="""
         CREATE TABLE Users(
         id int NOT NULL,
-        age_category int,
-        goal int
-        status int,
+        age_category_id int,
+        goal_id int
+        status_id int,
         PRIMARY KEY (id)
         );
         """
@@ -69,3 +69,28 @@ class Database:
         );
         """
         self.execute(sql, commit=True)
+
+
+# добавление пользователя в таблицу пользователей
+def add_user(self, id: int, age_category_id: int = None, goal_id: int = None, status_id: int = None):
+        sql = f'INSERT INTO Users(id, age_category_id, goal_id, status_id) VALUES(?,?,?,?)'
+        parameters = (id, age_category_id, goal_id, status_id)
+        self.execute(sql, parameters, commit=True)
+
+# добавление возратной категории в таблицу возрастных категорий
+def add_age_category(self, id: int, age_category: str):
+        sql = f'INSERT INTO AgeCategories(id, age_category) VALUES(?,?)'
+        parameters = (id, age_category)
+        self.execute(sql, parameters, commit=True)
+
+# добавление цели в таблицу целей обучения
+def add_goal(self, id: int, goal: str):
+        sql = f'INSERT INTO Goals(id, goal) VALUES(?,?)'
+        parameters = (id, goal)
+        self.execute(sql, parameters, commit=True)
+
+# добавление статуса в таблицу статусов
+def add_status(self, id: int, status: str):
+        sql = f'INSERT INTO Statuses(id, status) VALUES(?,?)'
+        parameters = (id, status)
+        self.execute(sql, parameters, commit=True)
