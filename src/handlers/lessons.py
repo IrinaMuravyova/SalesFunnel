@@ -48,3 +48,13 @@ async def send_lesson(callback: types.CallbackQuery):
             reply_markup=builder.as_markup()
             )
         await callback.answer()
+
+
+
+# @router.message()
+# async def send_video(call: CallbackQuery):
+#     db.set_status(user_id=call.from_user.id, status='start_watch')
+#     await bot.send_video('path_to_video')
+#     await ascincio.time.sleep(900)
+#     if db.get_status(user_id=call.from_user.id) == 'start_watch':
+#         awawit call.answer(text='Не забудь посмотреть видео)')

@@ -30,11 +30,3 @@ async def choose_time_to_remind(message: types.Message):
 # нажал на кнопку 1 урок, поменяли статус на отправлено
 # через
 
-
-# @router.message()
-# async def send_video(call: CallbackQuery):
-#     db.set_status(user_id=call.from_user.id, status='start_watch')
-#     await bot.send_video('path_to_video')
-#     await ascincio.time.sleep(900)
-#     if db.get_status(user_id=call.from_user.id) == 'start_watch':
-#         awawit call.answer(text='Не забудь посмотреть видео)')
