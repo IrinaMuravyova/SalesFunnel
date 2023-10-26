@@ -2,7 +2,6 @@ from aiogram import Router, F
 from aiogram import types
 from aiogram.filters import Command
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-# from main import db
 
 router = Router()
 
@@ -12,10 +11,6 @@ async def start_handler(message: types.Message):
     builder.add(types.InlineKeyboardButton(
         text="На связи Бебрис",
         callback_data="step1")
-        # ,
-        # types.InlineKeyboardButton(
-        # text="Дальше",
-        # callback_data="step1_2")
     )
 
     await message.answer(f"<b>Привет, {message.from_user.first_name}!</b> 🌟" 
@@ -48,32 +43,7 @@ async def send_random_value(callback: types.CallbackQuery):
                 "\n\nНо помни: <b>твои большие усилия и регулярные занятия - ключ к успеху!</b> 💪",
         reply_markup=builder.as_markup()
     )
-    # await callback.message.edit_reply_markup()
-    # await callback.message.answer(
-    #     text="На связи Александр Бебрис и мой проект “English Galaxy”. Я Предлагаю познакомиться и потом я расскажу тебе, как этот бот поможет тебе заговорить на  английском! Самое крутое, что методика настолько простая, что английский будет усваиваться сам! Но тебе надо приложить усилия и просто заниматься!",
-    #     reply_markup=builder.as_markup(),
-    #     show_alert=True
-    # )
     await callback.answer()
-
-# @router.callback_query(F.data == "step1_2") 
-# async def send_message_to_step2(callback: types.CallbackQuery): 
-    
-#     name = callback.message.from_user.first_name
-    
-#     builder = InlineKeyboardBuilder()
-#     builder.add(types.InlineKeyboardButton(
-#         text="Хочу",
-#         callback_data="step2")
-#     )
-#     await callback.message.edit_reply_markup()
-#     await callback.message.answer(
-#         text=f"Привет, <b>{name}</b>!  🌟 Если ты мечтаешь свободно говорить на английском, успешно сдать международные экзамены 📜, начать новую жизнь в англоговорящей стране 🌍, путешествовать без языковых барьеров ✈️ или произвести впечатление на собеседовании 💼 - ты в нужном месте! Всего за 4 коротких урока 📚 ты сможешь начать общаться на базовом английском и убедиться, что английский - это проще, чем кажется, когда у тебя правильный подход и методика 🚀. Мы поберем идеальный для тебя формат обучения и составим программу, которая приведет тебя к желаемому результату в кратчайшие сроки! 💪",
-#         reply_markup=builder.as_markup(),
-#         show_alert=True,
-#         callback_data="step2"
-#     )
-#     await callback.answer()
 
 @router.callback_query(F.data == "step2")
 async def send_message_to_step3(callback: types.CallbackQuery):
@@ -109,28 +79,6 @@ async def send_message_to_step4(callback: types.CallbackQuery):
 @router.callback_query(F.data == "step4")
 async def send_message_to_step5(callback: types.CallbackQuery):
     builder = InlineKeyboardBuilder()
-    # builder.add(types.InlineKeyboardButton(
-    #     text="<17",
-    #     callback_data="step5"),
-    #     types.InlineKeyboardButton(
-    #     text="17-22",
-    #     callback_data="step5"),
-    #     types.InlineKeyboardButton(
-    #     text="23-29",
-    #     callback_data="step5"),
-    #     types.InlineKeyboardButton(
-    #     text="30-39",
-    #     callback_data="step5"),
-    #     types.InlineKeyboardButton(
-    #     text="40-49",
-    #     callback_data="step5"),
-    #     types.InlineKeyboardButton(
-    #     text="50-59",
-    #     callback_data="step5"),
-    #     types.InlineKeyboardButton(
-    #     text="60<",
-    #     callback_data="step5")
-    # )
     builder.row(types.InlineKeyboardButton(
         text="<17",
         callback_data="step5"))
