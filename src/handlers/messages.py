@@ -2,6 +2,10 @@ from aiogram import Router, F
 from aiogram import types
 from aiogram.filters import Command
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+from main import db
+from db_api import Database
+from time import sleep
+
 
 router = Router()
 
@@ -12,6 +16,8 @@ async def start_handler(message: types.Message):
         text="На связи Бебрис",
         callback_data="step1")
     )
+    db.add_user(id = message.from_user.id)
+    print(db.show_users())
 
     await message.answer(f"<b>Привет, {message.from_user.first_name}!</b> 🌟" 
                             "\n\nЕсли ты мечтаешь:" 
@@ -113,7 +119,6 @@ async def send_message_to_step5(callback: types.CallbackQuery):
     )
     await callback.answer()
     
-
 @router.callback_query(F.data == "step5")
 async def send_message_to_step6(callback: types.CallbackQuery):
     builder = InlineKeyboardBuilder()
@@ -296,7 +301,9 @@ async def send_message_to_step15(callback: types.CallbackQuery):
 
 @router.callback_query(F.data == "step15")
 async def send_message_to_step16(callback: types.CallbackQuery):
-    # db.set_status(user_id=callback.message.from_user.id, status_id=1)
+    # print(callback.message.from_user.id)
+    # print(db.set_status(user_id=callback.message.from_user.id, status_id=1))
+    
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(
         text="Начать урок",
