@@ -4,11 +4,12 @@ from aiogram.types import Message, URLInputFile, FSInputFile
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 import datetime
 from config import video_lessons, texts_for_lessons
+from loader import router_lessons, db
 
-router = Router()
+# router = lessons_router
 
 # отправка видео урока
-@router.callback_query(F.data == "lessons")
+@router_lessons.callback_query(F.data == "lessons")
 async def send_lesson(callback: types.CallbackQuery):
     for video in video_lessons:
         text = texts_for_lessons[video_lessons.index(video)]

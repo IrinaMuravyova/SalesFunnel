@@ -2,22 +2,27 @@ from aiogram import Router, F
 from aiogram import types
 from aiogram.filters import Command
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-from main import db
-from db_api import Database
-from time import sleep
+from loader import db, router_messages
+from time import sleep 
 
+def all_values_of_field(table: str, number_of_field: int) -> [str]:
+    all_values_of_field = []
+    for value_of_field in db.select_data_of_table(table = table):
+        all_values_of_field.append(value_of_field[number_of_field])
+        # print(f"all_values_of_field = {all_values_of_field}")
+    return all_values_of_field
 
-router = Router()
-
-@router.message(Command("start"))
+@router_messages.message(Command("start"))
 async def start_handler(message: types.Message):
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(
         text="На связи Бебрис",
         callback_data="step1")
     )
-    db.add_user(id = message.from_user.id)
-    print(db.show_users())
+
+    # если пользователь новый, то добавляю в таблицу Users
+    if message.from_user.id not in all_values_of_field(table="Users", number_of_field=0):
+        db.add_user(id = message.from_user.id)
 
     await message.answer(f"<b>Привет, {message.from_user.first_name}!</b> 🌟" 
                             "\n\nЕсли ты мечтаешь:" 
@@ -34,7 +39,7 @@ async def start_handler(message: types.Message):
                             "\n2. <b>Составит программу</b>, которая приведет тебя к желаемому результату в кратчайшие сроки! 💪",
         reply_markup=builder.as_markup())
 
-@router.callback_query(F.data == "step1")
+@router_messages.callback_query(F.data == "step1")
 async def send_random_value(callback: types.CallbackQuery):
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(
@@ -51,7 +56,7 @@ async def send_random_value(callback: types.CallbackQuery):
     )
     await callback.answer()
 
-@router.callback_query(F.data == "step2")
+@router_messages.callback_query(F.data == "step2")
 async def send_message_to_step3(callback: types.CallbackQuery):
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(
@@ -66,7 +71,7 @@ async def send_message_to_step3(callback: types.CallbackQuery):
     )
     await callback.answer()
 
-@router.callback_query(F.data == "step3")
+@router_messages.callback_query(F.data == "step3")
 async def send_message_to_step4(callback: types.CallbackQuery):
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(
@@ -82,30 +87,30 @@ async def send_message_to_step4(callback: types.CallbackQuery):
     )
     await callback.answer()
 
-@router.callback_query(F.data == "step4")
+@router_messages.callback_query(F.data == "step4")
 async def send_message_to_step5(callback: types.CallbackQuery):
     builder = InlineKeyboardBuilder()
     builder.row(types.InlineKeyboardButton(
         text="<17",
-        callback_data="step5"))
+        callback_data="<17_button_pressed"))
     builder.row(types.InlineKeyboardButton(
         text="17-22",
-        callback_data="step5"),
+        callback_data="17-22_button_pressed"),
         types.InlineKeyboardButton(
         text="23-29",
-        callback_data="step5"),
+        callback_data="23-29_button_pressed"),
         types.InlineKeyboardButton(
         text="30-39",
-        callback_data="step5"))
+        callback_data="30-39_button_pressed"))
     builder.row(types.InlineKeyboardButton(
         text="40-49",
-        callback_data="step5"),
+        callback_data="40-49_button_pressed"),
         types.InlineKeyboardButton(
         text="50-59",
-        callback_data="step5"))
+        callback_data="50-59_button_pressed"))
     builder.row(types.InlineKeyboardButton(
         text="60<",
-        callback_data="step5"))
+        callback_data="60<_button_pressed"))
     
     await callback.message.edit_text(
         text="🤝 <b>А теперь давай немного познакомимся! </b>🌟 "
@@ -118,49 +123,78 @@ async def send_message_to_step5(callback: types.CallbackQuery):
         show_alert=True
     )
     await callback.answer()
-    
-@router.callback_query(F.data == "step5")
+
+@router_messages.callback_query(F.data.in_(["step5", 
+                                            "<17_button_pressed", 
+                                            "17-22_button_pressed",
+                                            "23-29_button_pressed", 
+                                            "30-39_button_pressed", 
+                                            "40-49_button_pressed", 
+                                            "50-59_button_pressed", 
+                                            "60<_button_pressed"]))
 async def send_message_to_step6(callback: types.CallbackQuery):
+     # сохраняю возрастной диапазон пользователя после нажатия на кнопку
+    for age_category in all_values_of_field(table="AgeCategories", number_of_field=1):
+        if callback.data.startswith(age_category):
+            db.set_age_category(age_category = age_category, id = callback.from_user.id)
+    # print(f"db.show_users()={db.show_users()}")
+    
     builder = InlineKeyboardBuilder()
     builder.row(types.InlineKeyboardButton(
         text="Для работы в IT 🖥",
-        callback_data="step6")),
+        callback_data="Для работы в IT")),
     builder.row(types.InlineKeyboardButton(
         text="Для работы в офисе 🏢",
-        callback_data="step6")),
+        callback_data="Для работы в офисе")),
     builder.row(types.InlineKeyboardButton(
         text="Для работы в иностранной компании 🌍",
-        callback_data="step6")),
+        callback_data="Для работы в иностранной")),
     builder.row(types.InlineKeyboardButton(
         text="Для повышения по должности 📈🚀",
-        callback_data="step6")),
+        callback_data="Для повышения по должности")),
     builder.row(types.InlineKeyboardButton(
         text="Для учебы 📚🎓",
-        callback_data="step6")),
+        callback_data="Для учебы")),
     builder.row(types.InlineKeyboardButton(
         text="Для путешествий ✈️🌍",
-        callback_data="step6")),
+        callback_data="Для путешествий")),
     builder.row(types.InlineKeyboardButton(
         text="Для иммиграции в другую страну 🌏",
-        callback_data="step6")),
+        callback_data="Для иммиграции")),
     builder.row(types.InlineKeyboardButton(
         text="Для саморазвития 📖📚🧠",
-        callback_data="step6")),
+        callback_data="Для саморазвития")),
     builder.row(types.InlineKeyboardButton(
         text="Для чтения книг и просмотра фильмов 📖📺🍿",
-        callback_data="step6")),
+        callback_data="Для чтения книг")),
     builder.row(types.InlineKeyboardButton(
         text="Другое",
-        callback_data="step6")
-    )
+        callback_data="Другое"))
+
     await callback.message.edit_text(
         text="Скажи, для чего ты учишь английский?",
         reply_markup=builder.as_markup()
         )
     await callback.answer()
 
-@router.callback_query(F.data == "step6")
+@router_messages.callback_query(F.data.in_(["step6", 
+                                            "Для работы в IT", 
+                                            "Для работы в офисе",
+                                            "Для работы в иностранной", 
+                                            "Для повышения по должности", 
+                                            "Для учебы", 
+                                            "Для путешествий", 
+                                            "Для иммиграции",
+                                            "Для саморазвития",
+                                            "Для чтения книг",
+                                            "Другое"]))
 async def send_message_to_step7(callback: types.CallbackQuery):
+    # сохраняю выбранное значение цели обучения
+    for goal in all_values_of_field(table="Goals", number_of_field=1):
+        if callback.data.startswith(goal):
+            db.set_goal_id(goal = goal, id = callback.from_user.id)
+    print(f"db.show_users()={db.show_users()}")
+
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(
         text="Давай",
@@ -172,7 +206,7 @@ async def send_message_to_step7(callback: types.CallbackQuery):
         )
     await callback.answer()
 
-@router.callback_query(F.data == "step7")
+@router_messages.callback_query(F.data == "step7")
 async def send_message_to_step8(callback: types.CallbackQuery):
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(
@@ -187,7 +221,7 @@ async def send_message_to_step8(callback: types.CallbackQuery):
         )
     await callback.answer()
 
-@router.callback_query(F.data == "step8")
+@router_messages.callback_query(F.data == "step8")
 async def send_message_to_step9(callback: types.CallbackQuery):
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(
@@ -204,7 +238,7 @@ async def send_message_to_step9(callback: types.CallbackQuery):
         )
     await callback.answer()
 
-@router.callback_query(F.data == "step9")
+@router_messages.callback_query(F.data == "step9")
 async def send_message_to_step10(callback: types.CallbackQuery):
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(
@@ -224,7 +258,7 @@ async def send_message_to_step10(callback: types.CallbackQuery):
         )
     await callback.answer()
 
-@router.callback_query(F.data == "step10")
+@router_messages.callback_query(F.data == "step10")
 async def send_message_to_step11(callback: types.CallbackQuery):
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(
@@ -239,7 +273,7 @@ async def send_message_to_step11(callback: types.CallbackQuery):
         )
     await callback.answer()
 
-@router.callback_query(F.data == "step11")
+@router_messages.callback_query(F.data == "step11")
 async def send_message_to_step12(callback: types.CallbackQuery):
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(
@@ -252,7 +286,7 @@ async def send_message_to_step12(callback: types.CallbackQuery):
         )
     await callback.answer()
 
-@router.callback_query(F.data == "step12")
+@router_messages.callback_query(F.data == "step12")
 async def send_message_to_step13(callback: types.CallbackQuery):
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(
@@ -268,7 +302,7 @@ async def send_message_to_step13(callback: types.CallbackQuery):
         )
     await callback.answer()
 
-@router.callback_query(F.data == "step13")
+@router_messages.callback_query(F.data == "step13")
 async def send_message_to_step14(callback: types.CallbackQuery):
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(
@@ -281,7 +315,7 @@ async def send_message_to_step14(callback: types.CallbackQuery):
         )
     await callback.answer()
 
-@router.callback_query(F.data == "step14")
+@router_messages.callback_query(F.data == "step14")
 async def send_message_to_step15(callback: types.CallbackQuery):
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(
@@ -299,11 +333,9 @@ async def send_message_to_step15(callback: types.CallbackQuery):
         )
     await callback.answer()
 
-@router.callback_query(F.data == "step15")
+@router_messages.callback_query(F.data == "step15")
 async def send_message_to_step16(callback: types.CallbackQuery):
-    # print(callback.message.from_user.id)
-    # print(db.set_status(user_id=callback.message.from_user.id, status_id=1))
-    
+
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(
         text="Начать урок",
