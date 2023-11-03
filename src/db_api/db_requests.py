@@ -45,6 +45,7 @@ class Database:
         age_category_id int,
         goal_id int,
         status_id int,
+        video_id int,
         PRIMARY KEY (id)
         );
         """
@@ -85,9 +86,9 @@ class Database:
 
 
     # добавление пользователя в таблицу пользователей
-    def add_user(self, id: int, age_category_id: int = None, goal_id: int = None, status_id: int = None):
-            sql = f'INSERT INTO Users(id, age_category_id, goal_id, status_id) VALUES(?,?,?,?)'
-            parameters = (id, age_category_id, goal_id, status_id)
+    def add_user(self, id: int, age_category_id: int = None, goal_id: int = None, status_id: int = None, video_id: int = None):
+            sql = f'INSERT INTO Users(id, age_category_id, goal_id, status_id, video_id) VALUES(?,?,?,?, ?)'
+            parameters = (id, age_category_id, goal_id, status_id, video_id)
             self.execute(sql, parameters, commit=True)
 
     # добавление возратной категории в таблицу возрастных категорий
@@ -159,16 +160,30 @@ class Database:
             self.execute(sql, parameters, commit=True)
 
     # установка статуса видео для пользователя
-    def set_status(self, **kwargs):
-            sql = f'UPDATE Users SET status_id WHERE '
-            parameters = self.format_args(sql, kwargs)
+    def set_status(self, status_id: int, **kwargs):
+            sql = f'UPDATE Users SET status_id={status_id} WHERE '
+            sql, parameters = self.format_args(sql, kwargs)
             self.execute(sql, parameters, commit=True)
 
     # получение статуса видео для пользователя
     def get_status_from_user(self, **kwargs)-> list:
         sql = 'SELECT status_id FROM Users WHERE '
+        sql, parameters = self.format_args(sql, kwargs)  
+        result = self.execute(sql, parameters, fetchone=True)   
+        return result[0]
+    
+    # установка индекса текущего урока для пользователя
+    def set_video_id(self, video_id: int, **kwargs):
+        sql = f'UPDATE Users SET video_id={video_id} WHERE '
         sql, parameters = self.format_args(sql, kwargs)
-        return self.execute(sql, parameters, fetchone=True)
+        self.execute(sql, parameters, commit=True)
+
+        # получение статуса видео для пользователя
+    def get_video_id_from_user(self, **kwargs)-> list:
+        sql = 'SELECT video_id FROM Users WHERE '
+        sql, parameters = self.format_args(sql, kwargs)  
+        result = self.execute(sql, parameters, fetchone=True)   
+        return result[0]
 
     # показывает все записи таблицы Users
     def show_users(self):

@@ -1,61 +1,38 @@
-from aiogram import Router, F
+from aiogram import F
 from aiogram import types
-from aiogram.types import Message, URLInputFile, FSInputFile
+from aiogram.types import URLInputFile
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-import datetime
+from .reminders import check_status_and_remind
 from config import video_lessons, texts_for_lessons
-from loader import router_lessons, db
-
-# router = lessons_router
+from loader import router_lessons, db, bot
 
 # отправка видео урока
 @router_lessons.callback_query(F.data == "lessons")
 async def send_lesson(callback: types.CallbackQuery):
+
     for video in video_lessons:
-        text = texts_for_lessons[video_lessons.index(video)]
-        
-        # Сюда будем помещать file_id отправленных файлов, чтобы потом ими воспользоваться
-        # file_ids = []
-        
-        callback.message.delete
+        db.set_video_id(video_id=video_lessons.index(video), id = callback.from_user.id)
+        # callback.message.delete
 
         # Отправка файла по ссылке
-        # video_from_url = URLInputFile( "https://youtu.be/GavBpRVYilE")
         video_from_url = URLInputFile(video)
-        
         callback.message.video
-        result = await callback.message.answer_video(
+        await callback.message.answer_video(
             video= video_from_url,
             caption=" "
-        )
-
-        # Отправка файла из файловой системы
-        # video_from_pc = FSInputFile("/Users/irinamuravyeva/Documents/TelegramBots_Python/SalesFunnel/src/db_api/VideoFiles/001 gr.mp4")
-        # result = await callback.message.answer_video(
-        #     video_from_pc,
-        #     caption=" "
-        # )
+            )
         
-        # file_ids.append(result.video[-1].file_id)
-
         builder = InlineKeyboardBuilder()
         builder.add(types.InlineKeyboardButton(
             text="Следующий урок",
-            callback_data="lessons")
+            callback_data="next_lesson")
         )
-
+        
+        text = texts_for_lessons[video_lessons.index(video)]
         await callback.message.answer(
             text=text, 
             reply_markup=builder.as_markup()
             )
         await callback.answer()
 
-
-
-# @router.message()
-# async def send_video(call: CallbackQuery):
-#     db.set_status(user_id=call.from_user.id, status='start_watch')
-#     await bot.send_video('path_to_video')
-#     await ascincio.time.sleep(900)
-#     if db.get_status(user_id=call.from_user.id) == 'start_watch':
-#         awawit call.answer(text='Не забудь посмотреть видео)')
+        await check_status_and_remind(callback)

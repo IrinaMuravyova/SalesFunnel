@@ -20,6 +20,7 @@ bot = Bot(token=config.bot_token.get_secret_value(), parse_mode=ParseMode.HTML)
 dp = Dispatcher(storage=MemoryStorage()) # создаём объект диспетчера. все данные бота, которые мы не сохраняем в БД (к примеру состояния), будут стёрты при перезапуске
 router_messages = Router()
 router_lessons = Router()
+router_reminders = Router()
 db_path = Path('db_api', 'database','clients.db')
 db = Database(db_path=db_path)
 

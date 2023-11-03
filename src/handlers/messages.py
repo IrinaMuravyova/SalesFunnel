@@ -1,9 +1,12 @@
+# import asyncio
 from aiogram import Router, F
 from aiogram import types
 from aiogram.filters import Command
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from loader import db, router_messages
-from time import sleep 
+# from time import sleep 
+import time
+
 
 def all_values_of_field(table: str, number_of_field: int) -> [str]:
     all_values_of_field = []
@@ -193,7 +196,7 @@ async def send_message_to_step7(callback: types.CallbackQuery):
     for goal in all_values_of_field(table="Goals", number_of_field=1):
         if callback.data.startswith(goal):
             db.set_goal_id(goal = goal, id = callback.from_user.id)
-    print(f"db.show_users()={db.show_users()}")
+    # print(f"db.show_users()={db.show_users()}")
 
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(
@@ -336,6 +339,9 @@ async def send_message_to_step15(callback: types.CallbackQuery):
 @router_messages.callback_query(F.data == "step15")
 async def send_message_to_step16(callback: types.CallbackQuery):
 
+    db.set_status(status_id=1, id = callback.from_user.id)
+    print(f"db.show_users()={db.show_users()}")
+
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(
         text="Начать урок",
@@ -347,4 +353,5 @@ async def send_message_to_step16(callback: types.CallbackQuery):
         reply_markup=builder.as_markup()
         )
     await callback.answer()
+
 
