@@ -342,10 +342,12 @@ async def send_message_to_step16(callback: types.CallbackQuery):
     db.set_status(status_id=1, id = callback.from_user.id)
     print(f"db.show_users()={db.show_users()}")
 
+    db.set_video_id(video_id=-1, id = callback.from_user.id) # убрать после отладки
+
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(
         text="Начать урок",
-        callback_data="lessons")
+        callback_data="lesson_1")
     )
     await callback.message.edit_text(
         text="🌟<b> Отличное решение!</b> "
